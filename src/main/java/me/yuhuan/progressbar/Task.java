@@ -5,7 +5,7 @@ import java.time.*;
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
-public class TaskState {
+public class Task {
     String name;
     int cur = 0;
     int max = 0;
@@ -13,7 +13,7 @@ public class TaskState {
     LocalDateTime startTime = null;
     LocalDateTime endTime = null;
 
-    public TaskState(String name, int cur, int max) {
+    public Task(String name, int cur, int max) {
         this.name = name;
         this.cur = cur;
         this.max = max;

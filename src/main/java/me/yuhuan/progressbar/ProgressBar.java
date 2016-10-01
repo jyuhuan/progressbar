@@ -1,43 +1,43 @@
 package me.yuhuan.progressbar;
 
-import java.time.Duration;
-
 /**
  * @author Yuhuan Jiang (jyuhuan@gmail.com).
  */
 public class ProgressBar {
 
-    TaskState task = null;
+    static char Empty = '□';
+    static char Filled = '■';
+
+    Task task = null;
     Thread updater = null;
 
     public ProgressBar(String name, int max) throws Exception {
-        this(name, max, 500L);
+        this(name, max, 100L);
     }
 
     public ProgressBar(String name, int max, final long refreshInterval) throws Exception {
         if (max == -1) throw new Exception("Indefinite progress bar not supported yet! ");
-        else task = new TaskState(name, 0, max);
+        else task = new Task(name, 0, max);
 
         // Start a thread that updates the display periodically.
-        updater = new Thread() {
-            @Override
+        updater = new Thread(new Runnable() {
             public void run() {
                 try {
                     while (true) {
                         refresh();
                         Thread.sleep(refreshInterval);
                     }
+                } catch (InterruptedException ignored) {
                 }
-                catch (InterruptedException e) {}
             }
-        };
+        });
     }
 
 
     /**
      * Updates the display.
      */
-    void refresh() {
+    private void refresh() {
         /// Step 1: Flush the old line
         Terminal.returnCarriage();
 
@@ -47,12 +47,16 @@ public class ProgressBar {
 
         String prefix = task.name + " " + task.percentageStr() + " [";
         String suffix = "] " + task.ratioStr();
-        int allowedLength = Terminal.width() - prefix.length() - suffix.length();
+
+        //int screenWidth = Terminal.width();
+        int screenWidth = 50;
+
+        int allowedLength = screenWidth;// - prefix.length() - suffix.length();
 
         int numDots = ((int)Math.round(((double)task.cur) / task.max * allowedLength));
         int numSpaces = allowedLength - numDots;
 
-        String content = prefix + CharUtils.repeat('=', numDots) + CharUtils.repeat(' ', numSpaces) + suffix;
+        String content = prefix + CharUtils.repeat(Filled, numDots) + CharUtils.repeat(Empty, numSpaces) + suffix;
 
 
         /// Step 3: Draw the new task
